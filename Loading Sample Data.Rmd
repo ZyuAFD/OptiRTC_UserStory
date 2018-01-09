@@ -25,7 +25,7 @@ The sample data used for demonstrating the methods in this book is monitored at 
 
 filepath='https://github.com/ZyuAFD/OptiRTC_UserStory/raw/master/Sample%20Data/gold-meir-2017-feb-download.csv'
 
-GoldaMeir_Dt_Feb2017=fread(filepath,
+GoldaMeir_Dt=fread(filepath,
                            col.names=c('Time',
                                        'Inst_Rain',
                                        'Temp',
@@ -45,6 +45,6 @@ GoldaMeir_Dt_Feb2017=fread(filepath,
             Est_South_SoilM=Est_South_SoilM * make_unit("%"),
             Est_SoilM=Est_SoilM * make_unit("%")) 
     
-GoldaMeir_Dt_Feb2017 %>% head %>% kable
+GoldaMeir_Dt %>% head %>% kable
 
 ```
