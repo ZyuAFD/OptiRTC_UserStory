@@ -26,7 +26,7 @@ The sample data used for demonstrating the methods in this book is monitored at 
 filepath='https://github.com/ZyuAFD/OptiRTC_UserStory/raw/master/Sample%20Data/gold-meir-2017-feb-download.csv'
 
 GoldaMeir_Dt_Feb2017=fread(filepath,
-                           col.names=c('Time_UTC',
+                           col.names=c('Time',
                                        'Inst_Rain',
                                        'Temp',
                                        'Est_North_SoilM',
@@ -35,7 +35,7 @@ GoldaMeir_Dt_Feb2017=fread(filepath,
                                        'Est_South_SoilM',
                                        'Est_SoilM')) %>% 
     # Convert time information from character to time type using "lubridate" package
-    mutate(Time_UTC=ymd_hms(Time_UTC,tz="UTC")) %>% 
+    mutate(Time=ymd_hms(Time,tz="UTC")) %>% 
     #Assign unit information to each data stream
     mutate(Inst_Rain=Inst_Rain * make_unit("inch"),
             Temp=Temp * make_unit("degF"),
