@@ -1,3 +1,8 @@
+## Story 1: Inconsistent time intervals for individual data streams
+
+The OptiRTC data is collect on real time. The inconsistent interval of the logged data makes it difficult to import the data into some software application or analysis software without significant manipulating and reanalysis. Code is needed that normalizes the time interval of the data streams to user-specified values. 
+
+
 ### packages required for analysis
 ```
 library(tidyverse)
@@ -10,9 +15,7 @@ library(kableExtra)
 ### Loading sample data
 ```{r}
 
-path='F:\\Projects\\Opti\\DTW_Apriori\\Data\\'
-file='gold-meir-2017-feb-download.csv'
-filepath=paste0(path,file)
+filepath='https://github.com/ZyuAFD/OptiRTC_UserStory/raw/master/Sample%20Data/gold-meir-2017-feb-download.csv'
 
 GoldaMeir_Dt_Feb2017=fread(filepath,
                            col.names=c('Time_UTC',
