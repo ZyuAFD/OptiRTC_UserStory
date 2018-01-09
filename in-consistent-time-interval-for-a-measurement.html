@@ -124,84 +124,243 @@ $(document).ready(function () {
 <div id="story-1-inconsistent-time-intervals-for-individual-data-streams" class="section level2">
 <h2>Story 1: Inconsistent time intervals for individual data streams</h2>
 <p>The OptiRTC data is collect on real time. The inconsistent interval of the logged data makes it difficult to import the data into some software application or analysis software without significant manipulating and reanalysis. Code is needed that normalizes the time interval of the data streams to user-specified values.</p>
-<div id="packages-required-for-analysis" class="section level3">
-<h3>packages required for analysis</h3>
-<pre><code>library(tidyverse)
-library(data.table)
-library(RcppRoll)
-library(knitr)
-library(kableExtra)</code></pre>
+<div id="loading-sample-data" class="section level4">
+<h4>Loading Sample Data</h4>
+<pre class="r"><code>source(&quot;https://raw.githubusercontent.com/OptiRTC/export-analysis/ZyuAFD-patch-1/Data/Loading%20Sample%20Data.R?token=AKLn5qDAj4bxtrQ6mDc1_JLrD910hcKUks5aXjcTwA%3D%3D&quot;)</code></pre>
 </div>
-<div id="loading-sample-data" class="section level3">
-<h3>Loading sample data</h3>
-<pre class="{r}"><code>
-filepath='https://github.com/ZyuAFD/OptiRTC_UserStory/raw/master/Sample%20Data/gold-meir-2017-feb-download.csv'
-
-GoldaMeir_Dt_Feb2017=fread(filepath,
-                           col.names=c('Time_UTC',
-                                       'Inst_Rain_in',
-                                       'Temp_F',
-                                       'Est_North_SoilM',
-                                       'Est_NorthCtr_SoilM',
-                                       'Est_SouthCtr_SoilM',
-                                       'Est_South_SoilM',
-                                       'Est_SoilM')) %&gt;% 
-    mutate(Time=ymd_hms(Time_UTC),
-           Time_Stamp=ymd_hm(substr(Time_UTC,1,16)))
-
-rm(path,file)</code></pre>
-</div>
-<div id="this-code-is-a-sample-of-aggregation-of-rain-gauge-data-on-golda-meir-data." class="section level3">
-<h3>This code is a sample of aggregation of rain gauge data on Golda Meir data.</h3>
+<div id="this-code-is-a-sample-of-aggregation-of-rain-gauge-data-on-golda-meir-data." class="section level4">
+<h4>This code is a sample of aggregation of rain gauge data on Golda Meir data.</h4>
 <ul>
-<li>The time interval could be specified by usersh. This value has to be the built-in strings for “unit” parameter in <a href="https://github.com/tidyverse/lubridate/blob/master/R/round.r">lubridate::round_date</a> function.</li>
 <li>The data quality is first checked of the duplicated time step for rain data</li>
 </ul>
-<pre><code>#Time_Intv= &quot;hour&quot; # constant of time interval in lubridate::round_date function
+<pre class="r"><code># Extract Rain information for analysis
+Rain_dt=GoldaMeir_Dt %&gt;% select(Time,Inst_Rain) %&gt;% filter(!is.na(Inst_Rain))
 
-GoldaMeir_Dt_Feb2017 %&gt;% head(10) %&gt;% kable
-
-# Extract Rain information for analysis
-Rain_dt=GoldaMeir_Dt_Feb2017 %&gt;% select(Time,Inst_Rain_in) %&gt;% filter(!is.na(Inst_Rain_in))
-
-Rain_dt %&gt;% head(10)%&gt;% kable
-
-# Check duplicate time step
+Rain_dt %&gt;% head(10)%&gt;% kable</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Time</th>
+<th align="right">Inst_Rain</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">2015-12-03 15:34:01</td>
+<td align="right">0 inch</td>
+</tr>
+<tr class="even">
+<td align="left">2015-12-03 15:29:01</td>
+<td align="right">0 inch</td>
+</tr>
+<tr class="odd">
+<td align="left">2015-12-03 15:24:01</td>
+<td align="right">0 inch</td>
+</tr>
+<tr class="even">
+<td align="left">2015-12-03 15:19:01</td>
+<td align="right">0 inch</td>
+</tr>
+<tr class="odd">
+<td align="left">2015-12-03 15:14:01</td>
+<td align="right">0 inch</td>
+</tr>
+<tr class="even">
+<td align="left">2015-12-03 15:09:01</td>
+<td align="right">0 inch</td>
+</tr>
+<tr class="odd">
+<td align="left">2015-12-03 15:04:01</td>
+<td align="right">0 inch</td>
+</tr>
+<tr class="even">
+<td align="left">2015-12-03 14:59:01</td>
+<td align="right">0 inch</td>
+</tr>
+<tr class="odd">
+<td align="left">2015-12-03 14:54:01</td>
+<td align="right">0 inch</td>
+</tr>
+<tr class="even">
+<td align="left">2015-12-03 14:49:01</td>
+<td align="right">0 inch</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code># Check duplicate time step
 
 Rain_dt %&gt;% 
     group_by(Time) %&gt;% 
     tally %&gt;% 
     filter(n&gt;1) %&gt;% 
     arrange(-n)</code></pre>
+<pre><code>## # A tibble: 0 x 2
+## # ... with 2 variables: Time &lt;dttm&gt;, n &lt;int&gt;</code></pre>
 <ul>
-<li>Time steps are then rounded up to the ceiling time intervals specified by users</li>
+<li>Time steps are then rounded up to a time interval value of 5 minutes ( This string has to be among the built-in strings for “unit” parameter in <a href="https://github.com/tidyverse/lubridate/blob/master/R/round.r">lubridate::round_date</a> function). In this case, <a href="https://github.com/tidyverse/lubridate/blob/master/R/round.r">lubridate::floordate</a> is used since rain gauge data is a cumulative value aggregated down to its nearest round time point.</li>
 <li>Check the duplicated time interval and aggregate the rain data upon it</li>
 </ul>
-<p>```{r Time step round,echo=TRUE} # Round time into specified time interval Rain_dt %&lt;&gt;% mutate(Time_rnd=lubridate::ceiling_date(Time,Time_Intv))</p>
-<p>Rain_dt %&gt;% head%&gt;% kable</p>
-</div>
-</div>
-<div id="check-duplicate-time-on-rounded-time" class="section level1">
-<h1>Check duplicate time on rounded time</h1>
-<p>Rain_dt %&gt;% group_by(Time_rnd) %&gt;% tally %&gt;% filter(n&gt;1) %&gt;% arrange(-n)</p>
-</div>
-<div id="aggregate-the-rain-amount" class="section level1">
-<h1>Aggregate the rain amount</h1>
-<p>Rain_dt %&lt;&gt;% group_by(Time_rnd) %&gt;% summarise(Inst_Rain_in=sum(Inst_Rain_in))</p>
-<p>Rain_dt %&gt;% head(10)%&gt;% kable</p>
-<p>```</p>
+<pre class="r"><code>Time_Intv= &quot;hour&quot; # constant of time interval in lubridate::round_date function
+# Round time into specified time interval
+Rain_dt %&lt;&gt;% 
+    mutate(Time_rnd=lubridate::floor_date(Time,Time_Intv))
+
+Rain_dt %&gt;% head%&gt;% kable</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Time</th>
+<th align="right">Inst_Rain</th>
+<th align="left">Time_rnd</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">2015-12-03 15:34:01</td>
+<td align="right">0 inch</td>
+<td align="left">2015-12-03 15:00:00</td>
+</tr>
+<tr class="even">
+<td align="left">2015-12-03 15:29:01</td>
+<td align="right">0 inch</td>
+<td align="left">2015-12-03 15:00:00</td>
+</tr>
+<tr class="odd">
+<td align="left">2015-12-03 15:24:01</td>
+<td align="right">0 inch</td>
+<td align="left">2015-12-03 15:00:00</td>
+</tr>
+<tr class="even">
+<td align="left">2015-12-03 15:19:01</td>
+<td align="right">0 inch</td>
+<td align="left">2015-12-03 15:00:00</td>
+</tr>
+<tr class="odd">
+<td align="left">2015-12-03 15:14:01</td>
+<td align="right">0 inch</td>
+<td align="left">2015-12-03 15:00:00</td>
+</tr>
+<tr class="even">
+<td align="left">2015-12-03 15:09:01</td>
+<td align="right">0 inch</td>
+<td align="left">2015-12-03 15:00:00</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code># Check duplicate time on rounded time 
+Rain_dt %&gt;% 
+    group_by(Time_rnd) %&gt;% 
+    tally %&gt;% 
+    filter(n&gt;1) %&gt;% 
+    arrange(-n) </code></pre>
+<pre><code>## # A tibble: 2,493 x 2
+##               Time_rnd     n
+##                 &lt;dttm&gt; &lt;int&gt;
+##  1 2015-08-21 20:00:00    12
+##  2 2015-08-21 21:00:00    12
+##  3 2015-08-21 22:00:00    12
+##  4 2015-08-21 23:00:00    12
+##  5 2015-08-22 00:00:00    12
+##  6 2015-08-22 01:00:00    12
+##  7 2015-08-22 02:00:00    12
+##  8 2015-08-22 03:00:00    12
+##  9 2015-08-22 04:00:00    12
+## 10 2015-08-22 05:00:00    12
+## # ... with 2,483 more rows</code></pre>
+<pre class="r"><code># Aggregate the rain amount 
+Rain_dt %&lt;&gt;% 
+    group_by(Time_rnd) %&gt;% 
+    summarise(Inst_Rain=sum(Inst_Rain))
+
+Rain_dt %&gt;% head(10)%&gt;% kable</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Time_rnd</th>
+<th align="right">Inst_Rain</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">2015-08-21 19:00:00</td>
+<td align="right">0 inch</td>
+</tr>
+<tr class="even">
+<td align="left">2015-08-21 20:00:00</td>
+<td align="right">0 inch</td>
+</tr>
+<tr class="odd">
+<td align="left">2015-08-21 21:00:00</td>
+<td align="right">0 inch</td>
+</tr>
+<tr class="even">
+<td align="left">2015-08-21 22:00:00</td>
+<td align="right">0 inch</td>
+</tr>
+<tr class="odd">
+<td align="left">2015-08-21 23:00:00</td>
+<td align="right">0 inch</td>
+</tr>
+<tr class="even">
+<td align="left">2015-08-22 00:00:00</td>
+<td align="right">0 inch</td>
+</tr>
+<tr class="odd">
+<td align="left">2015-08-22 01:00:00</td>
+<td align="right">0 inch</td>
+</tr>
+<tr class="even">
+<td align="left">2015-08-22 02:00:00</td>
+<td align="right">0 inch</td>
+</tr>
+<tr class="odd">
+<td align="left">2015-08-22 03:00:00</td>
+<td align="right">0 inch</td>
+</tr>
+<tr class="even">
+<td align="left">2015-08-22 04:00:00</td>
+<td align="right">0 inch</td>
+</tr>
+</tbody>
+</table>
 <ul>
-<li>Check the data gaps in the aggregated data ```{r Gap Check,echo=TRUE}</li>
+<li>Check the data gaps in the aggregated data</li>
 </ul>
-<p>FindGaps=function(Dt,Tm_intv=Time_Intv) #Dt dataframe with time column #Tm_intv: min gap, use time interval here { Dt %&gt;% arrange(Time) %&gt;% mutate(lagT=lag(Time)) %&gt;% filter(as.period(interval(lagT,Time))&gt;period(Time_Intv))-&gt;gaps</p>
-<pre><code>gaps %&gt;% 
-    mutate(Intv=interval(lagT,Time)) %&gt;% 
-    select(Intv) %&gt;% 
-    mutate(Prd=as.period(Intv)) %&gt;% 
-    return</code></pre>
-<p>}</p>
-<p>Rain_dt %&gt;% rename(Time=Time_rnd) %&gt;% FindGaps %&gt;% rename(Time_interval=Intv, Period=Prd) %&gt;% kable</p>
-<p>```</p>
+<pre class="r"><code>FindGaps=function(Dt,Tm_intv)
+    #Dt dataframe with time column
+    #Tm_intv: min gap, use time interval here
+{
+    Dt %&gt;% 
+        arrange(Time) %&gt;% 
+        mutate(lagT=lag(Time)) %&gt;% 
+        filter(as.period(interval(lagT,Time))&gt;period(Tm_intv))-&gt;gaps
+    
+    if (nrow(gaps)==0) return(&quot;No Gaps&quot;)
+    
+    gaps %&gt;% 
+        mutate(Time_interval=interval(lagT,Time)) %&gt;% 
+        select(Time_interval) %&gt;% 
+        mutate(Period=as.period(Time_interval)) %&gt;% 
+        return
+}
+
+Rain_dt %&gt;% 
+    rename(Time=Time_rnd) %&gt;% 
+    FindGaps(Tm_intv=Time_Intv) %&gt;% 
+    kable</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">x</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">No Gaps</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 
 

@@ -3,17 +3,15 @@
 The OptiRTC data is collect on real time. The inconsistent interval of the logged data makes it difficult to import the data into some software application or analysis software without significant manipulating and reanalysis. Code is needed that normalizes the time interval of the data streams to user-specified values. 
 
 #### Loading Sample Data
-```{r}
-source("https://raw.githubusercontent.com/OptiRTC/export-analysis/ZyuAFD-patch-1/Data/Loading%20Sample%20Data.R?token=AKLn5rGPTqNNcFtKpLbpDNUbnIuuDWwVks5aXi_PwA%3D%3D")
+```{r message=F,warning=F}
+source("https://raw.githubusercontent.com/OptiRTC/export-analysis/ZyuAFD-patch-1/Data/Loading%20Sample%20Data.R?token=AKLn5qDAj4bxtrQ6mDc1_JLrD910hcKUks5aXjcTwA%3D%3D")
 ```
 
 #### This code is a sample of aggregation of rain gauge data on Golda Meir data. 
 
 - The data quality is first checked of the duplicated time step for rain data
 
-```{r}
-
-GoldaMeir_Dt %>% head(10) %>% kable 
+```{r Check data quality on duplicated steps,message=F,warning=F}
 
 # Extract Rain information for analysis
 Rain_dt=GoldaMeir_Dt %>% select(Time,Inst_Rain) %>% filter(!is.na(Inst_Rain))
@@ -33,7 +31,7 @@ Rain_dt %>%
 - Time steps are then rounded up to a time interval value of 5 minutes ( This string has to be among the built-in strings for "unit" parameter in [lubridate::round_date](https://github.com/tidyverse/lubridate/blob/master/R/round.r) function). In this case, [lubridate::floordate](https://github.com/tidyverse/lubridate/blob/master/R/round.r) is used since rain gauge data is a cumulative value aggregated down to its nearest round time point.
 - Check the duplicated time interval and aggregate the rain data upon it
 
-```{r}
+```{r Aggregation on rain data in specified time interval,message=F,warning=F}
 
 Time_Intv= "hour" # constant of time interval in lubridate::round_date function
 # Round time into specified time interval
@@ -71,7 +69,8 @@ FindGaps=function(Dt,Tm_intv)
         mutate(lagT=lag(Time)) %>% 
         filter(as.period(interval(lagT,Time))>period(Tm_intv))->gaps
     
-    if (nrow(gaps)==0) return
+    if (nrow(gaps)==0) return("No Gaps")
+    
     gaps %>% 
         mutate(Time_interval=interval(lagT,Time)) %>% 
         select(Time_interval) %>% 
