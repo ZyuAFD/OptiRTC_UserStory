@@ -45,7 +45,8 @@ Rain_dt %>%
     group_by(Time) %>% 
     tally %>% 
     filter(n>1) %>% 
-    arrange(-n)
+    arrange(-n) %>% 
+    kable
 ```
 
 
@@ -66,12 +67,10 @@ Rain_dt %>%
 
 
 
-<table>
-<thead><tr><th scope=col>Time</th><th scope=col>n</th></tr></thead>
-<tbody>
-</tbody>
-</table>
-
+    
+    
+    |Time |  n|
+    |:----|--:|
 
 
 - Time steps are then rounded up to a time interval value of 5 minutes ( This string has to be among the built-in strings for "unit" parameter in [lubridate::round_date](https://github.com/tidyverse/lubridate/blob/master/R/round.r) function). In this case, [lubridate::floordate](https://github.com/tidyverse/lubridate/blob/master/R/round.r) is used since rain gauge data is a cumulative value aggregated down to its nearest round time point.
