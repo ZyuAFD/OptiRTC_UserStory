@@ -86,7 +86,8 @@ Rain_dt %>%
     group_by(Time_rnd) %>% 
     tally %>% 
     filter(n>1) %>% 
-    arrange(-n) 
+    arrange(-n)  %>% 
+    kable
 
 # Aggregate the rain amount 
 Rain_dt %<>% 
