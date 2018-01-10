@@ -18,12 +18,6 @@ source_https <- function(url, ...) {
     eval(parse(text = getURL(u, followlocation = TRUE, cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl"))), envir = .GlobalEnv)
   })
 }
-
-```
-
-
-```R
-
 source_https("https://raw.githubusercontent.com/OptiRTC/export-analysis/ZyuAFD-patch-1/Data/Loading%20Sample%20Data.R?token=AKLn5hDhdHsZqC5eLuQoMFs5obp-79keks5aX59SwA%3D%3D")
 ```
 
