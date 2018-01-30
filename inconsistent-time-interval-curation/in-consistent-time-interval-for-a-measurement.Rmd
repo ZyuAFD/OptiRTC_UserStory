@@ -5,7 +5,7 @@ The OptiRTC data is collect on real time. The inconsistent interval of the logge
 #### Loading Sample Data
 ```{r message=F,warning=F}
 library(devtools)
-source_url("https://raw.githubusercontent.com/OptiRTC/export-analysis/ZyuAFD-patch-1/Data/Loading%20Sample%20Data.R?token=AKLn5qDAj4bxtrQ6mDc1_JLrD910hcKUks5aXjcTwA%3D%3D")
+source_url("https://raw.githubusercontent.com/OptiRTC/export-analysis/ZyuAFD-patch-1/Data/Loading%20Sample%20Data.R?token=AKLn5qtCQw2wdWyFj7-K_iBfF_SC7qI1ks5acIeYwA%3D%3D")
 ```
 
 #### This code is a sample of aggregation of rain gauge data on Golda Meir data. 
@@ -34,7 +34,7 @@ Rain_dt %>%
 
 ```{r Aggregation on rain data in specified time interval,message=F,warning=F}
 
-Time_Intv= "hour" # constant of time interval in lubridate::round_date function
+Time_Intv= "5 mins" # constant of time interval in lubridate::round_date function
 # Round time into specified time interval
 Rain_dt %<>% 
     mutate(Time_rnd=lubridate::floor_date(Time,Time_Intv))
@@ -86,6 +86,23 @@ Rain_dt %>%
 
 ```
 
+```{r}
+Rain_dt %<>% 
+    filter(!data.table::between(Time_rnd, ymd('2015-09-01'),ymd_h('2015-09-01 2')))
+           
+Rain_dt %>% 
+    rename(Time=Time_rnd) %>% 
+    FindGaps(Tm_intv=Time_Intv) %>% 
+    kable
+
+
+Rain_dt %<>% pad
+
+Rain_dt %>% 
+    filter(data.table::between(Time_rnd, ymd('2015-09-01'),ymd('2015-09-02'))) %>% 
+    head(20)
+
+```
 
 
 
