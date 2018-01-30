@@ -12,5 +12,7 @@ Discrete data measurements, such as rainfall, runoff and CSOs etc, are should be
 
 #### Type 2: average approximating continuous information
 
+Other information, such as temperature, relative humidity and pressure etc, are continuous which should be approximated using average based methods \(e.g. interpolation, smooth\).
+
 
 
