@@ -87,9 +87,10 @@ Rain_dt %>% head(10)
 ```
 
 
+    Sample of raw data
     
-    
-    |Time                | Inst_Rain|Time_rnd            |
+
+|Time|Inst_Rain|Time_rnd            |
     |:-------------------|---------:|:-------------------|
     |2015-12-03 15:34:01 |    0 inch|2015-12-03 15:30:00 |
     |2015-12-03 15:29:01 |    0 inch|2015-12-03 15:25:00 |
@@ -101,16 +102,17 @@ Rain_dt %>% head(10)
 
 
     
+    Duplicated time points
     
-    |Time_rnd |  n|
-    |:--------|--:|
+|Time_rnd|counts|
+|:-------------------|---------:|
 
 
 
     
-    
-    |Time_rnd            | Inst_Rain|
-    |:-------------------|---------:|
+    Sample of aggregated results
+|Time_rnd|Inst_Rain|
+|:-------------------|---------:|
     |2015-08-21 19:30:00 |    0 inch|
     |2015-08-21 19:35:00 |    0 inch|
     |2015-08-21 19:40:00 |    0 inch|
@@ -181,23 +183,20 @@ Rain_dt %>%
 ```
 
 
-<table>
-<thead><tr><th scope=col>Time_interval</th><th scope=col>Period</th></tr></thead>
-<tbody>
-	<tr><td>2015-08-31 23:55:00 UTC--2015-09-01 00:25:00 UTC</td><td>30M 0S                                          </td></tr>
-</tbody>
-</table>
+|Time_rnd | Period|
+|:-------------------|---------:|
+|2015-08-31 23:55:00 UTC--2015-09-01 00:25:00 UTC|30M 0S  |   
 
 
 
     pad applied on the interval: 5 min
-    
+        
 
 
-    
-    
-    |Time_rnd            | Inst_Rain|
-    |:-------------------|---------:|
+
+
+|Time_rnd|Inst_Rain|
+|:-------------------|---------:|
     |2015-09-01 00:00:00 |        NA|
     |2015-09-01 00:05:00 |        NA|
     |2015-09-01 00:10:00 |        NA|
